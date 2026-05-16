@@ -1,6 +1,6 @@
 # Kubernetes Deployment on Azure AKS
 
-![Architecture](https://raw.githubusercontent.com/codedbykin/kubernetes-aks-taskboard/main/Project%205.png)
+![Architecture](architecture.png)
 
 ---
 
