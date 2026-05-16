@@ -1,11 +1,10 @@
 # Kubernetes Deployment on Azure AKS
-**Expert of Experts Cloud + AI Master Plan — Project 07 | Fields 01 & 02**
 
 ## What I Built
 A 2-tier application (Node.js REST API + Nginx frontend) deployed on Azure Kubernetes Service with automatic load balancing and auto-scaling.
 
 ## Architecture
-![Architecture Diagram](architecture.png)
+![Architecture Diagram](Project 5.png)
 
 ## Live App
 Deployed at: http://20.100.29.38
