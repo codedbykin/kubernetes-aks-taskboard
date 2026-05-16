@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: taskboard
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: taskboard
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: taskboard
+        tier: backend
+    spec:
+      containers:
+        - name: backend
+          image: node:20-alpine
+          command: ["node", "-e"]
+          args:
+            - |
+              const http = require('http');
+              const tasks = [
+                { id: 1, title: 'Deploy AKS cluster',   status: 'done'        },
+                { id: 2, title: 'Write YAML manifests', status: 'done'        },
+                { id: 3, title: 'Configure Ingress',    status: 'in-progress' },
+                { id: 4, title: 'Set up HPA',           status: 'todo'        }
+              ];
+              http.createServer((req, res) => {
+                res.setHeader('Content-Type', 'application/json');
+                res.setHeader('Access-Control-Allow-Origin', '*');
+                res.end(JSON.stringify({ tasks, servedBy: process.env.HOSTNAME }));
+              }).listen(3000, () => console.log('Backend on :3000'));
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+  namespace: taskboard
+spec:
+  selector:
+    app: taskboard
+    tier: backend
+  ports:
+    - port: 80
+      targetPort: 3000
+  type: ClusterIP
