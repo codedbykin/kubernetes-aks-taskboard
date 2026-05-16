@@ -1,44 +1,52 @@
 # Kubernetes Deployment on Azure AKS
-**Expert of Experts Cloud + AI Master Plan — Project 07 | Fields 01 & 02**
 
-## What I Built
-A 2-tier application (Node.js REST API + Nginx frontend) deployed on Azure Kubernetes Service with automatic load balancing and auto-scaling.
+![Architecture](https://raw.githubusercontent.com/codedbykin/kubernetes-aks-taskboard/main/Project%205.png)
 
-## Architecture
-![Architecture Diagram](architecture.png)
+---
 
-## Live App
-Deployed at: http://20.100.29.38
+## Overview
+
+This project demonstrates a production-style Kubernetes deployment on **Azure Kubernetes Service (AKS)**. A 2-tier application — Node.js REST API backend and Nginx frontend — is deployed across multiple Pods with automatic load balancing, health checks, and CPU-based auto-scaling.
+
+**Deployed and verified live at:** `http://20.100.29.38`
+
+---
 
 ## Tech Stack
-- Azure Kubernetes Service (AKS)
-- kubectl
-- YAML manifests
-- Node.js (backend API)
-- Nginx (frontend)
-- Azure Load Balancer (public IP)
-- Horizontal Pod Autoscaler (HPA)
 
-## What Kubernetes Does Here
-| Resource | What it does |
+| Layer | Technology |
 |---|---|
-| Namespace | Isolates the app inside the cluster |
-| Deployment | Keeps 2 Pods running always, auto-replaces if one crashes |
-| Service (ClusterIP) | Internal DNS so frontend always finds the backend |
-| Service (LoadBalancer) | Creates an Azure public IP automatically |
-| ConfigMap | Stores HTML config outside the container image |
-| HPA | Auto-scales backend Pods from 2→5 when CPU exceeds 70% |
+| Cloud Platform | Microsoft Azure |
+| Container Orchestration | Azure Kubernetes Service (AKS) |
+| Frontend | Nginx 1.25 (Alpine) |
+| Backend | Node.js 20 (Alpine) |
+| Networking | Azure Load Balancer, ClusterIP Service |
+| Scaling | Horizontal Pod Autoscaler (HPA) |
+| Configuration | Kubernetes ConfigMap |
+| CLI Tools | Azure CLI, kubectl |
+| Infrastructure | 2 × Standard_D2s_v3 nodes, Norway East |
 
-## How to Deploy
-```bash
-az group create --name rg-project07-aks --location norwayeast
-az aks create --resource-group rg-project07-aks --name aks-project07 --node-count 2 --node-vm-size Standard_D2s_v3 --generate-ssh-keys --location norwayeast
-az aks get-credentials --resource-group rg-project07-aks --name aks-project07
-kubectl apply -f k8s/
-```
+---
 
-## What I Learned
-- Kubernetes separates concerns cleanly — networking, scaling, and config are all independent
-- The HPA watches CPU in real time and adds Pods automatically with no manual intervention
-- Refreshing the app shows different Pod names in the footer — live load balancing across 2 containers
-- ConfigMaps let you update app config without rebuilding Docker images
+## What Kubernetes Does in This Project
+
+| Resource | Purpose |
+|---|---|
+| **Namespace** | Isolates all resources inside a dedicated `taskboard` namespace |
+| **Deployment** | Maintains 2 replicas at all times — auto-replaces crashed Pods |
+| **Service (ClusterIP)** | Internal DNS entry so the frontend always resolves the backend |
+| **Service (LoadBalancer)** | Provisions an Azure public IP automatically via AKS |
+| **ConfigMap** | Injects HTML into the Nginx container without rebuilding the image |
+| **HPA** | Scales backend Pods from 2 → 5 when average CPU exceeds 70% |
+| **Liveness Probe** | Restarts a Pod automatically if the app crashes |
+| **Readiness Probe** | Withholds traffic until the Pod is fully ready to serve requests |
+
+---
+
+## Project Structure
+kubernetes-aks-taskboard/
+└── k8s/
+    ├── 00-namespace.yaml      # Namespace: taskboard
+    ├── 01-backend.yaml        # Node.js Deployment + ClusterIP Service
+    ├── 02-frontend.yaml       # Nginx Deployment + LoadBalancer Service + ConfigMap
+    └── 03-hpa.yaml            # Horizontal Pod Autoscaler
